@@ -24,18 +24,23 @@ ImageView profileImage;
     private static int RESULT_LOAD_IMAGE = 1;
 Uri imageUri;
     Bitmap bitmap;
+    String finalUriString;
     TextView imageDate;
     TextView exifVersionDate;
     TextView orientationDate;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.main_activity);
 profileImage=(ImageView)  findViewById(R.id.img_mainActivity_loadedImg);
         imageDate=(TextView)  findViewById(R.id.text_mainActivity_date);
         exifVersionDate=(TextView)  findViewById(R.id.text_mainActivity_exifVersion);
         orientationDate=(TextView) findViewById(R.id.text_mainActivity_orientation);
         Button buttonLoadImage = (Button) findViewById(R.id.btn_mainActivity_buttonLoadPicture);
+
+
+
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -56,7 +61,6 @@ catch (Exception e){
 
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -66,9 +70,21 @@ catch (Exception e){
 
             try{
 
+
+
+                final Intent intent = new Intent(getApplicationContext(), SelectedImagesActivity.class);
                 bitmap=MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
                 profileImage.setImageBitmap(bitmap);
+               //
                 getData(imageUri);
+                intent.putExtra("Selected Image",imageUri.toString());
+
+                startActivity(intent);
+
+               // String finalUriString= intent.getStringExtra("Selected final Image");
+
+
+
 
             }
             catch(Exception e){
