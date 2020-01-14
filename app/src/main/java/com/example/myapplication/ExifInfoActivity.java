@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -14,7 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 
 public class ExifInfoActivity extends Activity {
@@ -28,6 +29,8 @@ Uri imageUri;
     TextView imageDate;
     TextView exifVersionDate;
     TextView orientationDate;
+    TextView testText;
+    String text;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +40,7 @@ profileImage=(ImageView)  findViewById(R.id.img_mainActivity_loadedImg);
         imageDate=(TextView)  findViewById(R.id.text_mainActivity_date);
         exifVersionDate=(TextView)  findViewById(R.id.text_mainActivity_exifVersion);
         orientationDate=(TextView) findViewById(R.id.text_mainActivity_orientation);
+        testText=(TextView) findViewById(R.id.text_mainActivity_testText);
         Button buttonLoadImage = (Button) findViewById(R.id.btn_mainActivity_buttonLoadPicture);
 
 
@@ -48,7 +52,7 @@ profileImage=(ImageView)  findViewById(R.id.img_mainActivity_loadedImg);
 try {
     Intent gallery = new Intent();
     gallery.setType("image/*");
-    gallery.setAction(Intent.ACTION_GET_CONTENT);
+    gallery.setAction(Intent.ACTION_OPEN_DOCUMENT);
     startActivityForResult(Intent.createChooser(gallery, "Sellect Picture"), RESULT_LOAD_IMAGE);
 
 }
@@ -57,7 +61,8 @@ catch (Exception e){
 }
             }
         });
-
+        loadData();
+        updateViews();
 
     }
 
@@ -79,6 +84,9 @@ catch (Exception e){
                 getData(imageUri);
                 intent.putExtra("Selected Image",imageUri.toString());
 
+
+                saveData();
+
                 startActivity(intent);
 
                // String finalUriString= intent.getStringExtra("Selected final Image");
@@ -96,7 +104,28 @@ catch (Exception e){
 
     }
 
-
+public void saveData(){
+    SharedPreferences sharedPreferences=getSharedPreferences("sharedPrefs",MODE_PRIVATE);
+    SharedPreferences.Editor editor=sharedPreferences.edit();
+    editor.putString("text",imageUri.toString());
+    editor.apply();
+    Toast.makeText(this, "Data saved",Toast.LENGTH_SHORT);
+}
+public void loadData(){
+    SharedPreferences sharedPreferences=getSharedPreferences("sharedPrefs",MODE_PRIVATE);
+    text=sharedPreferences.getString("text","");
+}
+public void updateViews(){
+        testText.setText(text);
+        try{
+            Log.e("eeee",text);
+            bitmap=MediaStore.Images.Media.getBitmap(getContentResolver(),Uri.parse(text));
+            profileImage.setImageBitmap(bitmap);
+        }
+        catch(Exception e){
+e.printStackTrace();
+        }
+}
     public void getData(Uri imageUri){
        ; // the URI you've received from the other app
         InputStream in;
